@@ -6,9 +6,15 @@ import { Formik, Form, Field, ErrorMessage, useField } from "formik";
 import Multiselect from "multiselect-react-dropdown";
 import Select from "react-select";
 import Modal from "react-bootstrap/Modal";
+import Toggle from 'react-toggle'
+import "react-toggle/style.css" ;
 
 export default function ProvidersPage(props) {
+  const {search,setActive}=props;
+  const isWorking=props.active;
+  console.log("Search: ",search)
   const [providers, setProviders] = useState([]);
+  const [filteredProviders, setFilteredProviders] = useState([]);
   const [isNew, setIsNew] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [offDays, setOffDays] = useState([
@@ -69,7 +75,7 @@ export default function ProvidersPage(props) {
           var data = element.data();
           data.id = element.id;
           // console.log("data: ", element.id);
-          if (data.active) {
+          if (data.active===isWorking) {
             setProviders((arr) => [...arr, data]);
             setShowLabel((val) => [...val, false]);
           }
@@ -97,7 +103,39 @@ export default function ProvidersPage(props) {
       setProviders([]);
       setServices([]);
     };
-  }, []);
+  }, [isWorking]);
+
+  useEffect(()=>{
+    setFilteredProviders([]);
+    console.log('location in provider: ',location==='All');
+    console.log('providers: ',providers);
+    if(search==='' && location==='All')
+    setFilteredProviders(providers);
+    else {
+      providers.forEach((item)=>{
+        if(location!=='All' && item.location.toLocaleLowerCase()===location.toLocaleLowerCase()){
+          if(search!==''){
+            if(item.email.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.specialist.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.phone.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+            )
+            setFilteredProviders(arr=>[...arr,item]);
+          }
+          else
+          setFilteredProviders(arr=>[...arr,item]);
+        }
+        else if(search!=='' && (
+          item.email.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.specialist.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.phone.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        ))
+        setFilteredProviders(arr=>[...arr,item]);
+      })
+    }
+    console.log("Filtered providers: ",filteredProviders)
+  },[search,location,providers])
 
   const handleShowLabel = (index) => {
     const labels = showLabel.map((label, idx) => {
@@ -186,6 +224,11 @@ export default function ProvidersPage(props) {
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Providers</h4>
+        <Toggle
+    checked={isWorking}
+    onChange={()=>setActive(act=>!act)} 
+    className='custom-toggle'
+    icons={false}/>
         <button
           className="add-provider-btn"
           onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
@@ -379,9 +422,9 @@ export default function ProvidersPage(props) {
                           <label>
                             <Field
                               type="checkbox"
-                              name="offDays"
+                              name="active"
                               className="day-checkbox"
-                              value={day.day}
+                              // value={day.day}
                             />
                             {day.day}
                           </label>
@@ -427,8 +470,8 @@ export default function ProvidersPage(props) {
       ) : (
         <div class="container px-4" style={{ marginTop: "30px" }}>
           <div class="row gx-5 gy-3">
-            {providers.length > 0 &&
-              providers.map((item, idx) => (
+            {filteredProviders.length > 0 &&
+              filteredProviders.map((item, idx) => (
                 <div class="col-md-6 col-sm-6 item">
                   <div
                     class="p-3"

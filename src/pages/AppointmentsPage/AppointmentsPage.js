@@ -2,14 +2,49 @@ import "./AppointmentsPage.css";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { useEffect, useState } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "../../index";
-import { type } from "@testing-library/user-event/dist/type";
+import Toggle from 'react-toggle';
+import "react-toggle/style.css" ;
+import { Modal,Button } from "react-bootstrap";
+import ConsentForm_1 from "../../components/Consent-1/Consent-1";
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/js/bootstrap.min.js";
 
-export default function AppointmentsPage({type}) {
+export default function AppointmentsPage(props) {
+  const {search,type,date,location,active,setActive}=props;
+  const today=new Date();
+  console.log("Search: ",search)
+  console.log("Date: ",date)
+  console.log("Today: ",today)
   console.log('type: ',type)
-    const [appointments,setAppointments]=useState([]);
+console.log('Location: ',location)
+const [appointments,setAppointments]=useState([]);
+    const [filteredAppointments,setFilteredAppointments]=useState([]);
+    const [showModel,setShowModel]=useState(false);
+    const [showCFModel,setShowCFModel]=useState(false);
+    const [users,setUsers]=useState([]);
+    const [user,setUser]=useState(null);
+    const [consentForm,setConsentForm]=useState('');
+    const [service,setService]=useState('');
+
 //   const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+useEffect(()=>{
+  const fetchUsers=async()=>{
+    await getDocs(collection(db, "users/userProfiles/AllUsers")).then((querySnapshot) => {
+        querySnapshot.forEach(element => {    
+            var data = element.data();    
+            console.log('users data: ',data);
+            setUsers(arr=>[...arr,data]);
+        });    
+    })
+}  
+fetchUsers()
+return function reset(){
+  setUsers([]);
+}
+},[])
 
 useEffect(()=>{
     const fetchAppointments=async()=>{
@@ -17,24 +52,161 @@ useEffect(()=>{
 
             querySnapshot.forEach(element => {    
                 var data = element.data();    
-                console.log('data: ',data.userBookingType?.toLowerCase());
-                if(type!=='all' && data.userBookingType && data.userBookingType.toLowerCase()===type)    
+                // console.log('data: ',data.userBookingType?.toLowerCase());
+                // if(new Date(data.userDate).getTime()>=today.getTime()){
+                  if(type!=='all' && data.userBookingType && data.userBookingType.toLowerCase()===type)    
                 setAppointments(arr => [...arr , data]);
                 else if(type==='all')
                 setAppointments(arr => [...arr , data]);
+                // }
             });    
         })
     }  
     fetchAppointments()
     const list=appointments
-    return function reset(){
-      setAppointments([]);
-    }
+    // return function reset(){
+    //   setAppointments([]);
+    // }
 },[type])
+
+useEffect(()=>{
+setFilteredAppointments([]);
+console.log('appointments: ',appointments)
+console.log('Search: ',search==='')
+console.log('Location: ',location)
+console.log('filteredAppointments: ',filteredAppointments)
+console.log('Active: ',active)
+console.log('date===today: ',date.getDate()===today.getDate())
+// console.log('date===today: ',date===today)
+if(active){
+  console.log('if block')
+  if(search==='' && location==='All' && date.getDate()===today.getDate()){
+    appointments.forEach((item)=>{
+      console.log("Is userdate today: ",new Date(item.userDate).getDate()===today.getDate())
+      if(new Date(item.userDate).getDate()===today.getDate())
+        setFilteredAppointments(arr=>[...arr,item])
+    })
+  }
+  else {
+    appointments.forEach((item)=>{
+      console.log('else block')
+      console.log(new Date(item.userDate).getTime()===date.getTime())
+      if(date.getDate()!==today.getDate()){
+        if(new Date(item.userDate).getDate()===date.getDate()){
+          if(location!=='All'){
+            if(item.userLocation===location){
+              if(search!==''){
+                if(item.providerName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+                item.userName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+                item.userEmail.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+                item.userAppointmentReason.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+              )
+              setFilteredAppointments(arr=>[...arr,item])
+              }
+              else
+              setFilteredAppointments(arr=>[...arr,item])
+            }
+          }
+          else
+          setFilteredAppointments(arr=>[...arr,item])
+        }
+      }
+      else if(location!=='All'){
+        if(item.userLocation===location){
+          if(search!==''){
+            if(item.providerName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.userName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.userEmail.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+            item.userAppointmentReason.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+          )
+          setFilteredAppointments(arr=>[...arr,item])
+          }
+          else
+          setFilteredAppointments(arr=>[...arr,item])
+        }
+      }
+      else if(search!==''){
+        if(item.providerName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+        item.userName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+        item.userEmail.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+        item.userAppointmentReason.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+      setFilteredAppointments(arr=>[...arr,item])
+      }
+    })
+  }
+}
+else {
+  if(search==='' && location==='All'){
+    appointments.forEach((item)=>{
+      if(new Date(item.userDate).getTime()<today.getTime() && new Date(item.userDate).getDate()!==today.getDate())
+        setFilteredAppointments(arr=>[...arr,item])
+    })
+  }
+  else {
+    appointments.forEach((item)=>{
+      if(new Date(item.userDate).getTime()<today.getTime() && new Date(item.userDate).getDate()!==today.getDate()){
+        if(location!=='All'){
+          if(item.userLocation===location){
+            if(search!==''){
+              if(item.providerName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+              item.userName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+              item.userEmail.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+              item.userAppointmentReason.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+            )
+            setFilteredAppointments(arr=>[...arr,item])
+            }
+            else
+            setFilteredAppointments(arr=>[...arr,item])
+          }
+        }
+        else if(search!==''){
+          if(item.providerName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+          item.userName.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+          item.userEmail.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
+          item.userAppointmentReason.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+        setFilteredAppointments(arr=>[...arr,item])
+        }
+      }
+    })
+  }
+}
+},[date,location,search,active])
+
+const handleClose=()=>{
+  setShowModel(false);
+  setUser(null)
+}
+
+const handleMFClose=()=>{
+  setShowCFModel(false);
+  setConsentForm('');
+}
+
+const getUser=(email)=>{
+  const value=users.find((item)=>item.email===email);
+  if(value)
+  setUser(value)
+  console.log('user: ',user)
+  setShowModel(true)
+}
+
+const getConsentForm=(appointment)=>{
+  setService(appointment.userAppointmentReason);
+  setShowCFModel(true);
+}
+
   return (
     <>
-      {/* <div style={{display:'flex',justifyContent:'space-between'}}> */}
+      <div style={{display:'flex',justifyContent:'space-between'}}>
       <h4 style={{marginBottom:'30px'}}>Appointments</h4>
+  <Toggle
+    // defaultChecked={active}
+    checked={active}
+    onChange={()=>setActive(act=>!act)} 
+    className='custom-toggle'
+    icons={false}/>
+    </div>
+    {/* <span>Custom icons</span> */}
       {/* <div style={{background:'#E7EDE5',padding:'15px'}}>
             <Row className="gx-5">
                 <Col xs='12' md='6' lg='6' style={{background:'white',padding:'15px'}} className="m-10">
@@ -55,7 +227,7 @@ useEffect(()=>{
         </div> */}
       <div class="container px-4">
         <div class="row gx-5 gy-3">
-          {appointments.length>0 && appointments.map((item, idx) => (
+          {filteredAppointments.length>0 && filteredAppointments.map((item, idx) => (
             <div class="col-md-6 col-sm-6 item">
               <div class="p-3" style={{ background: "white", borderRadius:'5px' }}>
                 <div class='row' style={{ background: "#E7EDE5", margin:'auto',padding:'10px 0px',borderRadius:'5px' }}>
@@ -70,7 +242,7 @@ useEffect(()=>{
                       className="doctor-icon"
                       style={{ marginTop: "13px" }}
                       alt="logo"
-                    /></div>
+                      /></div>
                 </div>
                 <div>
                     <div class='row gy-3' style={{ marginTop: "0px" }}>
@@ -88,7 +260,9 @@ useEffect(()=>{
                       className="doctor-icon"
                       alt="logo"
                     />
-                    <p className="item-value">{item.userName}</p>
+                    <p className="item-value pointer"
+                      onClick={()=>getUser(item.userEmail)}
+                      >{item.userName}</p>
                   </div>
                     {/* </div>
                     <div class='row'> */}
@@ -102,11 +276,28 @@ useEffect(()=>{
                   </div>
                   <div class='col-md-6' style={{ display: "inline-flex" }}>
                     <img
+                      src="../assets/icons8-envelope-30.png"
+                      className="doctor-icon"
+                      alt="logo"
+                    />
+                    <p className="item-value">{item.userEmail}</p>
+                  </div>
+                  <div class='col-md-6' style={{ display: "inline-flex" }}>
+                    <img
                       src="../assets/icons8-medical-service-67.png"
                       className="doctor-icon"
                       alt="logo"
                     />
-                    <p className="item-value">{item.userAppointmentReason}</p>
+                    <p className="item-value pointer"
+                    onClick={()=>getConsentForm(item)}>{item.userAppointmentReason}</p>
+                  </div>
+                  <div class='col-md-6' style={{ display: "inline-flex" }}>
+                    <img
+                      src="../assets/icons8-authentication-50.png"
+                      className="doctor-icon"
+                      alt="logo"
+                    />
+                    <p className="item-value">{item.activationCode}</p>
                   </div>
                     </div>              
                 </div>
@@ -114,6 +305,31 @@ useEffect(()=>{
             </div>
           ))}
         </div>
+        <Modal show={showModel} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{user?user.name:'No user found'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showCFModel} onHide={handleMFClose} fullscreen={true}>
+        <Modal.Header closeButton>
+          <Modal.Title>Consent Form </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ConsentForm_1/>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleMFClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
       </div>
     </>
   );
