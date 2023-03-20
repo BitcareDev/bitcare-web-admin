@@ -1,14 +1,19 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './HydraFacialInformedCF.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SignaturePad from 'react-signature-canvas';
 import { RxDotFilled } from 'react-icons/rx';
 
-function HydraFacialInformedCF(){
+function HydraFacialInformedCF({setSignature}){
     var [date,setDate] = useState(new Date());
     let sigPad = useRef({});
     let data = '';
 
+    useEffect(()=>{
+        const URL = sigPad.current.getTrimmedCanvas().toDataURL("image/png");
+        setSignature(URL)
+    },[sigPad])
+    
     function clear(){
         sigPad.current.clear();
       }
@@ -35,7 +40,7 @@ function HydraFacialInformedCF(){
                 <label for="date" className="consent8_text">Date: </label>
                 <input id="target" value={date.toLocaleDateString()}/>
             </div>
-            <div className="bg_consentform8">
+            <div className="bg_consentform8" id='hydra_facial'>
                 <SignaturePad
                     ref={sigPad}
                     penColor="black"

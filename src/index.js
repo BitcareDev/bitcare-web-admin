@@ -4,28 +4,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import firebase from "firebase/compat/app";
-import { getFirestore } from "firebase/firestore";
+import { AuthContextProvider } from './Context/AuthContext';
+import { ChatContextProvider } from './Context/ChatContext';
 
-// Use your config values here.
-// Initialize Firebase and Firestore
-const app = firebase.initializeApp({
-  apiKey: "AIzaSyBG4JnVt9HIIirTu-4RTOtUT1sGtTrEKgY",
-  authDomain: "bitcare-auth.firebaseapp.com",
-  databaseURL: "https://bitcare-auth-default-rtdb.firebaseio.com",
-  projectId: "bitcare-auth",
-  storageBucket: "bitcare-auth.appspot.com",
-  messagingSenderId: "957385368559",
-  appId: "1:957385368559:web:383bb407e769c0a8d1cc1a",
-  measurementId: "G-19JWT89DED",
-});
-
-const db = getFirestore(app);
-export { db };
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <AuthContextProvider>
+    <ChatContextProvider>
+      <App />
+    </ChatContextProvider>
+  </AuthContextProvider>
   // <React.StrictMode>
-    <App />
   // </React.StrictMode>
 );
 

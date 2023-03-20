@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../index";
+import { db } from "../../firebase";
 
 export default function ServicesPage(props) {
   const {search}=props;
@@ -19,7 +19,7 @@ export default function ServicesPage(props) {
           </button>
         </div>
         {isNew?<div>
-            <input type={'text'} onChange={(e)=>setService(e.target.value)}/>
+            <input className="email-input" onChange={(e)=>setService(e.target.value)}/>
             <button style={{marginLeft:'10px'}}
             onClick={async()=>await addDoc(collection(db, "ClinicServices"), {name:service})}>submit</button>
         </div>:<div class="container px-4" style={{ marginTop: "30px" }}>

@@ -3,15 +3,17 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { useEffect, useState } from "react";
 import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
-import { db } from "../../index";
+import { db } from "../../firebase";
 import Toggle from 'react-toggle';
 import "react-toggle/style.css" ;
 import { Modal,Button } from "react-bootstrap";
-import ConsentForm_1 from "../../components/Consent-1/Consent-1";
+import CryoskinCF from "../../components/CryoskinCF/CryoskinCF";
+import IPLaserHairRemovalCF from "../../components/IPLaserHairRemovalCF/IPLaserHairRemovalCF";
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap/dist/js/bootstrap.min.js";
 
 export default function AppointmentsPage(props) {
+  const empty_arr=[];
   const {search,type,date,location,active,setActive}=props;
   const today=new Date();
   console.log("Search: ",search)
@@ -47,8 +49,9 @@ return function reset(){
 },[])
 
 useEffect(()=>{
+  setAppointments([]);
     const fetchAppointments=async()=>{
-        await getDocs(collection(db, "ClinicBooking")).then((querySnapshot) => {
+        await getDocs(collection(db, type==='medspa'?"MedspaBooking":"ClinicBooking")).then((querySnapshot) => {
 
             querySnapshot.forEach(element => {    
                 var data = element.data();    
@@ -56,8 +59,8 @@ useEffect(()=>{
                 // if(new Date(data.userDate).getTime()>=today.getTime()){
                   if(type!=='all' && data.userBookingType && data.userBookingType.toLowerCase()===type)    
                 setAppointments(arr => [...arr , data]);
-                else if(type==='all')
-                setAppointments(arr => [...arr , data]);
+                // else if(type==='all')
+                // setAppointments(arr => [...arr , data]);
                 // }
             });    
         })
@@ -69,8 +72,11 @@ useEffect(()=>{
     // }
 },[type])
 
+// useEffect(()=>{
+// setFilteredAppointments([]);
+// },[date,location,search,active])
 useEffect(()=>{
-setFilteredAppointments([]);
+setFilteredAppointments(apmt=>[...empty_arr]);
 console.log('appointments: ',appointments)
 console.log('Search: ',search==='')
 console.log('Location: ',location)
@@ -170,7 +176,7 @@ else {
     })
   }
 }
-},[date,location,search,active])
+},[date,location,search,active,appointments])
 
 const handleClose=()=>{
   setShowModel(false);
@@ -191,8 +197,11 @@ const getUser=(email)=>{
 }
 
 const getConsentForm=(appointment)=>{
-  setService(appointment.userAppointmentReason);
+  if(appointment.userAppointmentReason==='Cryo Skin' || appointment.userAppointmentReason==='IPL Hair Removal'){
+    setService(appointment.userAppointmentReason);
   setShowCFModel(true);
+  }
+  
 }
 
   return (
@@ -227,7 +236,7 @@ const getConsentForm=(appointment)=>{
         </div> */}
       <div class="container px-4">
         <div class="row gx-5 gy-3">
-          {filteredAppointments.length>0 && filteredAppointments.map((item, idx) => (
+          {filteredAppointments.length>0? filteredAppointments.map((item, idx) => (
             <div class="col-md-6 col-sm-6 item">
               <div class="p-3" style={{ background: "white", borderRadius:'5px' }}>
                 <div class='row' style={{ background: "#E7EDE5", margin:'auto',padding:'10px 0px',borderRadius:'5px' }}>
@@ -236,9 +245,9 @@ const getConsentForm=(appointment)=>{
                 <div>{item.userselectedday}{" "}{item.userDate}</div>
                     </div>
                     <div class='col'><img
-                      src={item.userBookingType==='Clinic'?"../assets/clinic.png":
-                      item.userBookingType==='Covid'?"../assets/covid19.png":
-                      item.userBookingType==='MedSpa'?"../assets/medspa.png":"../assets/telemedicine.png"}
+                      src={item.userBookingType.toLocaleLowerCase()==='clinic'?"../assets/clinic.png":
+                      item.userBookingType.toLocaleLowerCase()==='covid'?"../assets/covid19.png":
+                      item.userBookingType.toLocaleLowerCase()==='medspa'?"../assets/medspa.png":"../assets/telemedicine.png"}
                       className="doctor-icon"
                       style={{ marginTop: "13px" }}
                       alt="logo"
@@ -303,7 +312,8 @@ const getConsentForm=(appointment)=>{
                 </div>
               </div>
             </div>
-          ))}
+          )):
+          <div>No data found</div>}
         </div>
         <Modal show={showModel} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -318,11 +328,11 @@ const getConsentForm=(appointment)=>{
       </Modal>
 
       <Modal show={showCFModel} onHide={handleMFClose} fullscreen={true}>
-        <Modal.Header closeButton>
-          <Modal.Title>Consent Form </Modal.Title>
-        </Modal.Header>
+        {/* <Modal.Header closeButton>
+          <Modal.Title>{service}</Modal.Title>
+        </Modal.Header> */}
         <Modal.Body>
-          <ConsentForm_1/>
+          {service==='Cryo Skin'?<CryoskinCF/>:<IPLaserHairRemovalCF/>}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleMFClose}>
