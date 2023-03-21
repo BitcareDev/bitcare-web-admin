@@ -314,6 +314,7 @@ export default function Home(props) {
         className="content-col"
         style={{ paddingLeft: '30px' }}>
 
+        
         <img src="../assets/icons8-menu-rounded-50.png" className="menu-logo" alt="logo" onClick={() => setShow(!show)} />
         {(active && select === 'appointment' || select === 'clinic' || select === 'medspa' || select === 'covid' || select === 'telemedicine') ? <DatePicker
           minDate={startDate}

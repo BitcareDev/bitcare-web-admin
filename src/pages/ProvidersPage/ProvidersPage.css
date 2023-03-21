@@ -3,7 +3,9 @@
     border: 1px solid rgb(2 112 74/var(--tw-text-opacity));
     color: white;
     border-radius: 5px;
+    padding: 10px;
 }
+
 #checkboxes label {
     float: left;
   }
@@ -60,3 +62,40 @@
 .item {
     display: flex;
 }
+
+.toggle-container {
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+}
+
+.toggle {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-label {
+  display: inline-block;
+  background-color: #ddd;
+  border-radius: 30px;
+  padding: 5px 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle:checked + .toggle-label {
+  background-color: #02704A;
+  color: white;
+}
+
+
+.toggle-text {
+  font-size: 15px;
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  position: absolute;
+}
+

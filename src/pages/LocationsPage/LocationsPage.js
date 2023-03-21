@@ -56,18 +56,25 @@ export default function LocationsPage(props) {
   return (<>
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <h4>Locations</h4>
-      <Toggle
-    checked={isOpen}
-    onChange={()=>setActive(act=>!act)} 
-    className='custom-toggle'
-    icons={false}/>
-      <button
+      <div className="toggle-container">
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={() => setActive(active => !active)}
+            className="toggle"
+            id="toggle"
+          />
+          <label htmlFor="toggle" className="toggle-label">
+            {active ? "Active" : "Inactive"}
+          </label>
+      </div>
+    </div>
+    <button
         className="add-provider-btn"
         onClick={() => setIsNew(true)}
       >
         Add location
-      </button>
-    </div>
+    </button>
     {isNew ? <div>
       <Formik
         enableReinitialize={true}
