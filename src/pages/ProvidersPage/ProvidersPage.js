@@ -10,7 +10,7 @@ import Toggle from 'react-toggle'
 import "react-toggle/style.css" ;
 
 export default function ProvidersPage(props) {
-  const {search,setActive}=props;
+  const {search,setActive,setFilter,filter}=props;
   const isWorking=props.active;
   const clinic_location=props.location;
   console.log("Search: ",search)
@@ -227,14 +227,19 @@ export default function ProvidersPage(props) {
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Providers</h4>
-        <Toggle
+        {filter && <Toggle
+        name={'Active'}
+        value={'Active'}
     checked={isWorking}
     onChange={()=>setActive(act=>!act)} 
     className='custom-toggle'
-    icons={false}/>
+    icons={false}/>}
         <button
           className="add-provider-btn"
-          onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
+          onClick={() => {
+            setFilter(false);
+            return !isEdit ? setIsNew(true) : setProvider(null)
+          }}
         >
           Add provider
         </button>
@@ -290,6 +295,7 @@ export default function ProvidersPage(props) {
               values.password = "11234";
               values.active = false;
               await addDoc(collection(db, "Providers"), values);
+              setIsNew(false);
               setTimeout(() => {
                 alert(
                   JSON.stringify(
@@ -317,6 +323,7 @@ export default function ProvidersPage(props) {
               // values.onDays=onDays;
               console.log("Values: ",values)
               await setDoc(doc(db, "Providers", provider.id), values);
+              setIsNew(false);
               setTimeout(() => {
                 alert(
                   JSON.stringify(
@@ -387,34 +394,6 @@ export default function ProvidersPage(props) {
                           isMulti={true}
                         />
                       )
-                      // <Select
-                      //   className='service-checkbox'
-                      //   isObject={false}
-                      //   name="services"
-                      //   defaultValue={selectedOption}
-                      //   // value={getValue()}
-                      //   onChange={setSelectedOption}
-                      //   // placeholder={placeholder}
-                      //   options={services}
-                      //   isMulti={true}
-
-                      // />
-
-                      // <Field name="services"
-                      // component={()=>
-                      // <Multiselect
-                      //   name="services"
-                      //   // displayValue="key"
-                      //   isObject={false}
-                      //   hideSelectedList
-                      //   onKeyPressFn={function noRefCheck(){}}
-                      //   onRemove={function noRefCheck(){}}
-                      //   onSearch={function noRefCheck(){}}
-                      //   onSelect={function noRefCheck(){}}
-                      //   options={services}
-                      //   showCheckbox={true}
-                      // />
-                      // }></Field>
                     }
                   </div>
                   <div class="col-md-8 col-sm-8 item">
@@ -459,7 +438,10 @@ export default function ProvidersPage(props) {
                   <div class="col-md-1 col-sm-1 item">
                     <button
                       type="button"
-                      onClick={() => setIsNew(false)}
+                      onClick={() => {
+                        setIsNew(false);
+                        setFilter(true);
+                      }}
                       style={{ border: "0" }}
                     >
                       Cancel
@@ -507,7 +489,9 @@ export default function ProvidersPage(props) {
                         />
                         {showLabel[idx] && (
                           <label style={{ position: "absolute" }}>
-                            <div onClick={() => setProvider(item)}>Edit</div>
+                            <div onClick={() => {
+                              setProvider(item);
+                              setFilter(false)}}>Edit</div>
                             <div onClick={() => removeProvider(item)}>
                               Delete
                             </div>

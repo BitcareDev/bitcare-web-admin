@@ -75,6 +75,7 @@ export default function Home(props) {
   const auth = getAuth();
   const navigate = useNavigate();
   const [signature,setSignature]=useState(null);
+  const [filter,setFilter]=useState(true);
 
   console.log(window.screen.width)
   useEffect(() => {
@@ -664,22 +665,22 @@ export default function Home(props) {
         <img src="../assets/icons8-menu-rounded-50.png" className="menu-logo" alt="logo" onClick={() => {
           uploadCF();
           setShow(!show)}} />
-        {(active && select === 'appointment' || select === 'clinic' || select === 'medspa' || select === 'covid' || select === 'telemedicine') ? <DatePicker
+        {(active && filter && select === 'appointment' || select === 'clinic' || select === 'medspa' || select === 'covid' || select === 'telemedicine') ? <DatePicker
           minDate={active?startDate:null}
           maxDate={active?endDate:yesterday}
           selected={day}
           onChange={(date) => setDay(date)}
           wrapperClassName='date-picker'
         /> : ''}
-        {(!adminLocation && !(select === 'location' || select === 'services')) ? <Form.Select style={{ width: 'auto', display: 'initial', marginLeft: '5%' }}
+        {(!adminLocation && filter && !(select === 'location' || select === 'services')) ? <Form.Select style={{ width: 'auto', display: 'initial', marginLeft: '5%' }}
           value={location} onChange={(e) => setLocation(e.target.value
           )}>
           {locations.map(item => <option>{item}</option>)}
         </Form.Select> : ''}
-        {selectedItem!=='chat' && <input type={'search'} placeholder='Search...' className="appointment-search"
+        {selectedItem!=='chat' && filter && <input type={'search'} placeholder='Search...' className="appointment-search"
           onChange={(e) => setSearch(e.target.value)} value={search} />}
         {selectedItem === 'locations' ? <LocationsPage search={search} active={active} setActive={setActive}/> : 
-        selectedItem === 'providers' ? <ProvidersPage search={search} location={location} active={active} setActive={setActive}/> :
+        selectedItem === 'providers' ? <ProvidersPage search={search} location={location} active={active} setActive={setActive} setFilter={setFilter} filter={filter}/> :
          selectedItem === 'users' ? <UsersPage search={search} location={location} active={active} setActive={setActive}/> :
           select === 'clinic' ? <AppointmentsPage type='clinic' search={search} location={location} date={day} active={active} setActive={setActive}/> : 
           select === 'medspa' ? <AppointmentsPage type='medspa' search={search} location={location} date={day} active={active} setActive={setActive}/> : 
