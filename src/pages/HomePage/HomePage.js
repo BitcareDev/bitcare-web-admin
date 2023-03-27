@@ -253,7 +253,7 @@ export default function Home(props) {
           </Container>
         </Navbar>
       ))} */}
-    <Row style={{ margin: '0px' }} className='menu-row'>
+   <div style={{ display:"flex", flexDirection: "row" }} className='menu-row'>
       {show && <Col
         xs="5"
         md='4'
@@ -261,11 +261,14 @@ export default function Home(props) {
         className="menu-col"
         style={{ paddingLeft: '20px' }}>
         <img src="../assets/logo.png" className="navbar-logo" alt="logo" />
-        <div style={{ marginTop: '10px' }}>
-          {!adminLocation && <>
+        <div style={{ height: '85%', overflowY: 'auto' }}>
+          {/* {!adminLocation && <>
             <div className="menu-item">Locations</div>
           <div className={"sub-item" + (select === 'location' ? ' selected' : '')}
-            onClick={() => editSelection('location')}>Info</div></>}
+            onClick={() => editSelection('location')}>Info</div></>} */}
+            <div className="menu-item">Locations</div>
+          <div className={"sub-item" + (select === 'location' ? ' selected' : '')}
+            onClick={() => editSelection('location')}>Info</div>
           <div className="menu-item">Providers</div>
           <div className={"sub-item" + (select === 'provider' ? ' selected' : '')}
             onClick={() => editSelection('provider')}>Info</div>
@@ -355,7 +358,7 @@ export default function Home(props) {
           </Button>
         </Modal.Footer>
       </Modal>
-    </Row>
+    </div>
   </>);
 }
 

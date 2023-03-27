@@ -6,6 +6,13 @@
     padding: 10px;
 }
 
+.add-provider-btn.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+
 #checkboxes label {
     float: left;
   }

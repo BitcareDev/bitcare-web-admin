@@ -18,6 +18,7 @@ export default function ProvidersPage(props) {
   const [isNew, setIsNew] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingProvider, setIsEditingProvider] = useState(false);
   const [offDays, setOffDays] = useState([
     {
       day: "Sun",
@@ -185,10 +186,16 @@ export default function ProvidersPage(props) {
 
   // }
 
+  // const handleEditProvider = (idx) => {
+  //   isEditing(true);
+  //   handleShowLabel(idx);
+  // };
+
   const handleEditProvider = (idx) => {
-    isEditing(true);
+    isEditingProvider(true);
     handleShowLabel(idx);
   };
+  
 
   
 
@@ -221,12 +228,13 @@ export default function ProvidersPage(props) {
     }
   }, [provider]);
 
-  const addProvider = () => {
-    setProvider(null);
-    // console.log("provider: ",provider);
-    setIsNew(true);
-    setIsEdit(false);
-  };
+  // const addProvider = () => {
+  //   setProvider(null);
+  //   // console.log("provider: ",provider);
+  //   setIsNew(true);
+  //   setIsEdit(false);
+  // };
+
   // useEffect(()=>{
   //   console.log('days updated',offDays);
   // },[offDays])
@@ -234,6 +242,21 @@ export default function ProvidersPage(props) {
   // const onChange = ({value}) => {
   //   setValue(value);
   // };
+
+  const addProvider = () => {
+    setProvider(null);
+    setIsNew(true);
+    setIsEdit(false);
+    setShowLabel(providers.map(() => false)); // Reset showLabel to hide all labels
+  };
+  
+  const handleCancel = () => {
+    setProvider(null);
+    setIsNew(false);
+    setIsEdit(false);
+    setShowLabel(providers.map(() => false)); // Reset showLabel to hide all labels
+  };
+  
 
   return (
     <>
@@ -265,13 +288,34 @@ export default function ProvidersPage(props) {
         </div>
 
       </div>
-      <button
+      {/* <button
         className="add-provider-btn"
         onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
         disabled={isEditing}
       >
         Add provider
-      </button>
+      </button> */}
+
+{/* {!isEdit && (
+  <button
+    className="add-provider-btn"
+    onClick={() => setIsNew(true)}
+    disabled={isEditing}
+  >
+    Add provider
+  </button>
+)} */}
+
+<button
+  className={`add-provider-btn ${isNew || isEdit ? 'disabled' : ''}`}
+  onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
+  disabled={isNew || isEdit}
+>
+  Add provider
+</button>
+
+
+
       {isNew ? (
         <Formik
           enableReinitialize={true}
@@ -511,7 +555,7 @@ export default function ProvidersPage(props) {
                   <div class="col-md-1 col-sm-1 item">
                     <button
                       type="button"
-                      onClick={() => setIsNew(false)}
+                      onClick={handleCancel}
                       style={{
                          border: "0",
                          paddingLeft: "15px",
@@ -565,19 +609,13 @@ export default function ProvidersPage(props) {
                         {showLabel[idx] && (
                           <label style={{ position: "absolute" }}>
                             <div onClick={() => setProvider(item)}>Edit</div>
-                            {/* <div onClick={() => removeProvider(item)}>
-                              Delete
-                            </div> */}
+                            {item.active && (
+                              <div onClick={() => removeProvider(item)}>Delete</div>
+                            )}
                           </label>
                         )}
-                        {showLabel[idx] && item.active && (
-                          <label style={{ position: "absolute", top: 20}}>
-                            {/* <div onClick={() => setProvider(item)}>Edit</div> */}
-                            <div onClick={() => removeProvider(item)}>
-                              Delete
-                            </div>
-                          </label>
-                        )}
+
+
                       </div>
                     </div>
                     <div>
