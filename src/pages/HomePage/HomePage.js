@@ -76,6 +76,8 @@ export default function Home(props) {
   const navigate = useNavigate();
   const [signature,setSignature]=useState(null);
   const [filter,setFilter]=useState(true);
+  const [userName,setUserName]=useState('');
+  const [errorMsg,setErrorMsg]=useState('');
 
   console.log(window.screen.width)
   useEffect(() => {
@@ -400,8 +402,15 @@ export default function Home(props) {
   }
 
   const onClose=()=>{
+    if(userName===''){
+      setErrorMsg('please fill this field.....');
+      return;
+    }
+    var date=new Date();
+    date.setMonth(date.getMonth()+1)
+    date=date.getDate()+'_'+date.getMonth()+'_'+date.getFullYear()+'_'+date.toLocaleTimeString();
     var htmlRef=document.querySelector('.modal-body');
-    // htmlRef.scrollTo(0,0)
+    htmlRef.scrollTo(0,0)
     var elmHeight= Math.floor((htmlRef.scrollHeight)*0.26);
     const pdf = new JsPDF("p", "mm",[elmHeight, 297]);
       html2canvas(htmlRef, {
@@ -433,8 +442,8 @@ export default function Home(props) {
                   contentType: 'application/pdf',
                 };
                 window.open(pdf.output('bloburl'), '_blank');
-                pdf.save('test.pdf');
-                const reportRef = ref(storage, 'ConsentForms/AspenLaser.pdf',metadata);
+                pdf.save(`${userName}_${select}_${date}.pdf`);
+                const reportRef = ref(storage, `ConsentForms/${userName}_${select}_${date}.pdf`,metadata);
                 const uploadTask = uploadBytesResumable(reportRef, output);
                 uploadTask.on(
                   (error) => {
@@ -448,74 +457,10 @@ export default function Home(props) {
                 );
         // pdf.save();
       });
-      // html2canvas(htmlRef, {
-      //   // allowTaint: true,
-      //   //     useCORS: true,
-      //   //     logging: false,
-      //   scrollX: -window.scrollX,
-      //   scrollY: -window.scrollY,
-      //   // height:htmlRef.scrollHeight,
-      //   windowWidth: document.documentElement.offsetWidth,
-      //   windowHeight: htmlRef.scrollHeight ,
-      // }).then((internal_canvas) => {
-      //   const internal_imgData = internal_canvas
-      //     .toDataURL("image/png")
-      //     .replace("image/png", "image/octet-stream");
-
-      //   const imgProps = pdf.getImageProperties(internal_imgData);
-      //   const pdfWidth = pdf.internal.pageSize.getWidth();
-      //   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      //   pdf.addImage(internal_imgData, "JPEG", 0, 0, pdfWidth, pdfHeight,'alias2','SLOW');
-      //   pdf.save();
-      // });
-    }
-
-
-    // mid working html_pdf solution
-    const working_html_pdf=()=>{
-    var htmlRef=document.querySelector('.modal-body');
-    var scrollHeight=htmlRef.scrollHeight;
-    var position=0;
-    window.scrollTo(0, 0);
-
-      // html2canvas(htmlRef, {
-      //   scrollX: -window.scrollX,
-      //   scrollY: -window.scrollY,
-      //   windowWidth: document.documentElement.offsetWidth,
-      //   windowHeight: htmlRef.scrollHeight,
-      // }).then((canvas) => {
-      //   const img = new Image();
-      //   img.src
-      //   const imgData = canvas
-      //     .toDataURL("image/png")
-      //     .replace("image/png", "image/octet-stream");
-
-      //   const pdf = new JsPDF("p", "mm", "a4");
-      //   const imgProps = pdf.getImageProperties(imgData);
-      //   const pdfWidth = pdf.internal.pageSize.getWidth();
-      //   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      //   pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      //   pdf.save();
-      // });
-
-      const pdf = new JsPDF("p", "mm", "a4");
-      while(position<=scrollHeight){
-        html2canvas(htmlRef).then((canvas) => {
-          const img = new Image();
-          const imgData = canvas
-            .toDataURL("image/png")
-            .replace("image/png", "image/octet-stream");
-  
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, pdfHeight);
-          htmlRef.scrollTo(0,imgProps.height)
-          position+=imgProps.height;
-        });
-        pdf.addPage()
-      }
-      pdf.save();
+      setUserName('');
+      setErrorMsg('');
+      setShowModal(false);
+      setSelect('provider')
     }
 
   return (<>
@@ -692,10 +637,17 @@ export default function Home(props) {
         {/* {select==='provider'?<ProvidersPage/>:<AppointmentsPage/>} */}
       </Col>
       <Modal show={showModal} onHide={()=>{
+        setUserName('');
+        setErrorMsg('');
         setShowModal(false);
         setSelect('provider')}} fullscreen={true}>
         <Modal.Header closeButton>
-          <Modal.Title>Consent Form</Modal.Title>
+          <div>
+          <Modal.Title>
+            <input type={'text'} required={true}
+          onChange={(e)=>setUserName(e.target.value)} value={userName}/>'s Consent Form</Modal.Title>
+          {errorMsg!=='' && <div style={{'color':'red'}}>{errorMsg}</div>}
+          </div>
         </Modal.Header>
         <Modal.Body id='custom-modal'>
           {console.log("Modal element: ",document.querySelector('.modal-body'))}
@@ -704,17 +656,16 @@ export default function Home(props) {
           select === 'Emsculpt Neo'?<EmsculptNeoCF/>:
           select === 'Cryoskin'?<CryoskinCF/>:select === 'IVII'?<IVII_CF/>:
           select === 'Oxygen Bar Informed'?<OxygenBarInformedCF/>:
-          select === 'Compression Therapy'?<CompressionTherapyCF/>:<AspenLaserCF setSignature={setSignature}/>}
+          select === 'Compression Therapy'?<CompressionTherapyCF/>:<HydraFacialInformedCF setSignature={setSignature}/>}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={()=>{
+          <Button style={{background:'#02704A'}}  onClick={()=>{
             onClose();
-            // doc.html(document.querySelector('.modal.show .modal-dialog')).then(() => {
-            //   doc.save('report.pdf');
-            //     const reportRef = ref(storage, 'ConsentForms/report.pdf');
-            //     console.log("reportRef: ",reportRef)
-            // });
-            // setShowModal(false);
+            }}>Submit</Button>
+          <Button variant="secondary" onClick={()=>{
+            setUserName('');
+            setErrorMsg('');
+            setShowModal(false);
             setSelect('provider')}}>
             Close
           </Button>
