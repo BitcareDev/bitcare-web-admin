@@ -199,7 +199,7 @@ const getConsentForm=(appointment)=>{
     <>
       <div style={{display:'flex',justifyContent:'space-between'}}>
       <h4 style={{marginBottom:'30px'}}>Appointments</h4>
-      {/* <label className="toggle-text">
+      <label className="toggle-text">
         <Toggle
           // defaultChecked={active}
           checked={active}
@@ -207,9 +207,9 @@ const getConsentForm=(appointment)=>{
           className='custom-toggle'
           icons={false}/>
           {active ? 'Active' : 'Inactive'}
-      </label> */}
+      </label>
 
-      <div className="toggle-container">
+      {/* <div className="toggle-container">
           <input
             type="checkbox"
             checked={active}
@@ -220,7 +220,7 @@ const getConsentForm=(appointment)=>{
           <label htmlFor="toggle" className="toggle-label">
             {active ? "Active" : "Inactive"}
           </label>
-        </div>
+        </div> */}
       </div>
     {/* <span>Custom icons</span> */}
       {/* <div style={{background:'#E7EDE5',padding:'15px'}}>

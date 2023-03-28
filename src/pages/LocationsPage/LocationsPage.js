@@ -41,22 +41,51 @@ export default function LocationsPage(props) {
     };
   }, [location,isOpen]);
 
+  // useEffect(()=>{
+  //   setFilteredLocations([]);
+  //   if(search==='')
+  //   setFilteredLocations(locations)
+  //   if(search!==''){
+  //     locations.forEach((item)=>{
+  //       if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || item.address.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+  //       setFilteredLocations((arr) => [...arr, item]);
+  //     })
+  //   }
+  // },[search,filterdLocations])
+
   useEffect(()=>{
     setFilteredLocations([]);
-    if(search==='')
-    setFilteredLocations(locations)
-    if(search!==''){
-      locations.forEach((item)=>{
-        if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || item.address.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-        setFilteredLocations((arr) => [...arr, item]);
-      })
+    if(search==='') {
+        setFilteredLocations(locations);
+    } else {
+        locations.forEach((item)=>{
+            const name = item.name ? item.name.toLocaleLowerCase() : '';
+            const address = item.address ? item.address.toLocaleLowerCase() : '';
+            if(name.includes(search.toLocaleLowerCase()) || address.includes(search.toLocaleLowerCase())) {
+                setFilteredLocations((arr) => [...arr, item]);
+            }
+        });
     }
-  },[search,filterdLocations])
+},[search, locations]);
+
 
   return (<>
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <h4>Locations</h4>
-      <div className="toggle-container">
+
+      <label className="toggle-text">
+          <Toggle
+            checked={active}
+            onChange={() => setActive(active => !active)}
+            className='custom-toggle'
+            placeholder={active ? 'Active' : 'In-Active'}
+            icons={false}
+          />
+          {active ? 'Active' : 'In-Active'}
+        </label>
+
+
+      {/* <div className="toggle-container">
           <input
             type="checkbox"
             checked={active}
@@ -67,7 +96,7 @@ export default function LocationsPage(props) {
           <label htmlFor="toggle" className="toggle-label">
             {active ? "Active" : "Inactive"}
           </label>
-      </div>
+      </div> */}
     </div>
     <button
         className="add-provider-btn"

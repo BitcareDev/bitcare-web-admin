@@ -70,7 +70,7 @@
     display: flex;
 }
 
-.toggle-container {
+/* .toggle-container {
   display: inline-block;
   position: relative;
   margin-right: 10px;
@@ -95,7 +95,7 @@
 .toggle:checked + .toggle-label {
   background-color: #02704A;
   color: white;
-}
+} */
 
 
 .toggle-text {
@@ -103,6 +103,6 @@
   display: flex;
   flex-direction: row;
   font-weight: bold;
-  position: absolute;
+  /* position: absolute; */
 }
 

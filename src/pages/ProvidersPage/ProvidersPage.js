@@ -263,7 +263,7 @@ export default function ProvidersPage(props) {
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Providers</h4>
    
-        {/* <label className="toggle-text">
+        <label className="toggle-text">
           <Toggle
             checked={isWorking}
             onChange={() => setActive(active => !active)}
@@ -272,9 +272,9 @@ export default function ProvidersPage(props) {
             icons={false}
           />
           {active ? 'Active' : 'In-Active'}
-        </label> */}
+        </label>
 
-        <div className="toggle-container">
+        {/* <div className="toggle-container">
           <input
             type="checkbox"
             checked={active}
@@ -285,7 +285,7 @@ export default function ProvidersPage(props) {
           <label htmlFor="toggle" className="toggle-label">
             {active ? "Active" : "Inactive"}
           </label>
-        </div>
+        </div> */}
 
       </div>
       {/* <button
