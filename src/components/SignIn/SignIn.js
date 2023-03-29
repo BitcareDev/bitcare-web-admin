@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, onValue} from "firebase/database";
 import {getAuth,signInWithEmailAndPassword} from 'firebase/auth';
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../index";
+import { db } from "../../firebase";
 
 export default function SignIn(props) {
   const navigate = useNavigate();
@@ -110,6 +110,7 @@ export default function SignIn(props) {
           {errorMessage && <div className="error">{errorMessage}</div>}
           <div className="input-container">
             <input
+            className="email-input"
               type="email"
               name="uname"
               required
@@ -120,6 +121,7 @@ export default function SignIn(props) {
           </div>
           <div className="input-container">
             <input
+            className="email-input"
               type="password"
               name="pass"
               required

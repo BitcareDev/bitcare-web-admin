@@ -2,7 +2,7 @@ import "./ProvidersPage.css";
 import { useEffect, useState }  from "react";
 import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../index";
+import { db } from "../../firebase";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
 import Multiselect from "multiselect-react-dropdown";
 import Select from "react-select";
@@ -13,8 +13,9 @@ import Switch from '@mui/joy/Switch';
 import Typography from '@mui/joy/Typography';
 
 export default function ProvidersPage(props) {
-  const {search,setActive}=props;
+  const {search,setActive,setFilter,filter}=props;
   const isWorking=props.active;
+  const clinic_location=props.location;
   console.log("Search: ",search)
   const [providers, setProviders] = useState([]);
   const [filteredProviders, setFilteredProviders] = useState([]);
@@ -75,6 +76,8 @@ export default function ProvidersPage(props) {
   const selectedServices = provider ? provider.services : props;
   const selectedOffDays = provider ? provider.offDays : props;
   useEffect(() => {
+    setProviders([]);
+    setShowLabel([]);
     const fetchProviders = async () => {
       await getDocs(collection(db, "Providers")).then((querySnapshot) => {
         querySnapshot.forEach((element) => {
@@ -113,13 +116,13 @@ export default function ProvidersPage(props) {
 
   useEffect(()=>{
     setFilteredProviders([]);
-    console.log('location in provider: ',location==='All');
+    console.log('location in provider: ',clinic_location);
     console.log('providers: ',providers);
-    if(search==='' && location==='All')
+    if(search==='' && clinic_location==='All')
     setFilteredProviders(providers);
     else {
       providers.forEach((item)=>{
-        if(location!=='All' && item.location.toLocaleLowerCase()===location.toLocaleLowerCase()){
+        if(clinic_location!=='All' && item.location.toLocaleLowerCase()===clinic_location.toLocaleLowerCase()){
           if(search!==''){
             if(item.email.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
             item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) ||
@@ -141,7 +144,7 @@ export default function ProvidersPage(props) {
       })
     }
     console.log("Filtered providers: ",filteredProviders)
-  },[search,location,providers])
+  },[search,clinic_location,providers,active])
 
   const handleShowLabel = (index) => {
     const labels = showLabel.map((label, idx) => {
@@ -410,6 +413,7 @@ export default function ProvidersPage(props) {
               values.password = "11234";
               values.active = false;
               await addDoc(collection(db, "Providers"), values);
+              setIsNew(false);
               setTimeout(() => {
                 alert(
                   JSON.stringify(
@@ -437,6 +441,7 @@ export default function ProvidersPage(props) {
               // values.onDays=onDays;
               console.log("Values: ",values)
               await setDoc(doc(db, "Providers", provider.id), values);
+              setIsNew(false);
               setTimeout(() => {
                 alert(
                   JSON.stringify(

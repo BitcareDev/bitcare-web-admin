@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../index";
+import { db } from "../../firebase";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
 import './LocationsPage.css';
 import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
@@ -285,7 +285,7 @@ export default function LocationsPage(props) {
       </Formik>
     </div> : <div class="container px-4" style={{ marginTop: "30px" }}>
       <div class="row gx-5 gy-3">
-        {filterdLocations && filterdLocations.length > 0 && filterdLocations.map((item, idx) => (<div class="col-md-6 col-sm-6 item">
+        {filterdLocations && filterdLocations.length > 0 && filterdLocations.map((item, idx) => (item.name && item.address && <div class="col-md-6 col-sm-6 item">
           <div
             class="p-3"
             style={{
