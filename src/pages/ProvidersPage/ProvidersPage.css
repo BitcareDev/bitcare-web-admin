@@ -106,3 +106,21 @@
   /* position: absolute; */
 }
 
+
+.custom-toggle .react-toggle-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.custom-toggle .react-toggle-track-check {
+  order: 2;
+  margin-left: 10px;
+}
+
+.custom-toggle .react-toggle-track-x {
+  order: 1;
+  margin-right: 10px;
+}
+

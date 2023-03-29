@@ -102,6 +102,7 @@ export default function Home(props) {
               setDay(new Date());
               setSearch('');
               setActive(true);
+              setShow(false);
               var isCF=consentForms.find(elm=>elm===item)
               console.log("iscf",isCF);
               if(isCF)

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "../../index";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
@@ -6,6 +7,8 @@ import './LocationsPage.css';
 import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
 import Toggle from 'react-toggle'
 import "react-toggle/style.css" ;
+import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 
 export default function LocationsPage(props) {
   const {search,setActive}=props;
@@ -73,7 +76,36 @@ export default function LocationsPage(props) {
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <h4>Locations</h4>
 
-      <label className="toggle-text">
+      <Switch 
+  checked={active}
+  onClick={() => setActive(active => !active)}
+  slotProps={{
+    track: {
+      children: (
+        <React.Fragment>
+          <Typography component="span" level="inherit" sx={{ ml: '10px', fontSize: "12px", fontWeight: "bold" }}>
+            Active
+          </Typography>
+          <Typography component="span" level="inherit" sx={{ ml: "5px", mr: "3px", fontSize: "12px", fontWeight: "bold" }}>
+            Inactive
+          </Typography>
+        </React.Fragment>
+      ),
+    },
+  }}
+  sx={{
+    '--Switch-thumbWidth': '50px',
+    '--Switch-thumbSize': '30px',
+    '--Switch-trackWidth': '100px',
+    '--Switch-trackHeight': '31px',
+    "& .MuiSwitch-track": {
+      backgroundColor: "#02704a !important"
+    }
+  }}
+/>
+
+
+      {/* <label className="toggle-text">
           <Toggle
             checked={active}
             onChange={() => setActive(active => !active)}
@@ -82,7 +114,7 @@ export default function LocationsPage(props) {
             icons={false}
           />
           {active ? 'Active' : 'In-Active'}
-        </label>
+        </label> */}
 
 
       {/* <div className="toggle-container">

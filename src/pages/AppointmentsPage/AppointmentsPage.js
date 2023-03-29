@@ -2,12 +2,15 @@ import "./AppointmentsPage.css";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { useEffect, useState } from "react";
+import * as React from "react";
 import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "../../index";
 import Toggle from 'react-toggle';
 import "react-toggle/style.css" ;
 import { Modal,Button } from "react-bootstrap";
 import ConsentForm_1 from "../../components/Consent-1/Consent-1";
+import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap/dist/js/bootstrap.min.js";
 
@@ -198,8 +201,36 @@ const getConsentForm=(appointment)=>{
   return (
     <>
       <div style={{display:'flex',justifyContent:'space-between'}}>
-      <h4 style={{marginBottom:'30px'}}>Appointments</h4>
-      <label className="toggle-text">
+      <h4 style={{marginBottom:'50px'}}>Appointments</h4>
+
+      <Switch
+      checked={active}
+      onClick={() => setActive(active => !active)}
+      slotProps={{
+        track: {
+          children: (
+            <React.Fragment>
+              <Typography component="span" level="inherit" sx={{ ml: '10px', fontSize: "12px", fontWeight: "bold" }}>
+                Active
+              </Typography>
+              <Typography component="span" level="inherit" sx={{ ml: "5px", mr: "3px", fontSize: "12px", fontWeight: "bold" }}>
+                Inactive
+              </Typography>
+            </React.Fragment>
+          ),
+        },
+      }}
+      sx={{
+        '--Switch-thumbWidth': '50px',
+        '--Switch-thumbSize': '30px',
+        '--Switch-trackWidth': '100px',
+        '--Switch-trackHeight': '31px',
+        "& .MuiSwitch-track": {
+          backgroundColor: "#02704a !important"
+        }
+      }}
+    />
+      {/* <label className="toggle-text">
         <Toggle
           // defaultChecked={active}
           checked={active}
@@ -207,7 +238,7 @@ const getConsentForm=(appointment)=>{
           className='custom-toggle'
           icons={false}/>
           {active ? 'Active' : 'Inactive'}
-      </label>
+      </label> */}
 
       {/* <div className="toggle-container">
           <input
@@ -241,7 +272,7 @@ const getConsentForm=(appointment)=>{
                 <Col xs='12' md='6' lg='6'></Col>
             </Row>
         </div> */}
-      <div class="container px-4">
+      <div class="container px-5">
         <div class="row gx-5 gy-3">
           {filteredAppointments.length>0 && filteredAppointments.map((item, idx) => (
             <div class="col-md-6 col-sm-6 item">

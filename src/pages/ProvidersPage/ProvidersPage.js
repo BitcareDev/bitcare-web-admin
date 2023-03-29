@@ -1,5 +1,6 @@
 import "./ProvidersPage.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState }  from "react";
+import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "../../index";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
@@ -8,6 +9,8 @@ import Select from "react-select";
 import Modal from "react-bootstrap/Modal";
 import Toggle from 'react-toggle'
 import "react-toggle/style.css" ;
+import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 
 export default function ProvidersPage(props) {
   const {search,setActive}=props;
@@ -262,8 +265,48 @@ export default function ProvidersPage(props) {
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Providers</h4>
+        {/* <label className="toggle-text">
+  <Toggle
+    checked={isWorking}
+    onChange={() => setActive(active => !active)}
+    className='custom-toggle'
+    checkedLabel={'Active'}
+    uncheckedLabel={'In-Active'}
+  />
+</label> */}
+
+
+<Switch
+      checked={isWorking}
+      onClick={() => setActive(active => !active)}
+      slotProps={{
+        track: {
+          children: (
+            <React.Fragment>
+              <Typography component="span" level="inherit" sx={{ ml: '10px', fontSize: "12px", fontWeight: "bold" }}>
+                Active
+              </Typography>
+              <Typography component="span" level="inherit" sx={{ ml: "5px", mr: "3px", fontSize: "12px", fontWeight: "bold" }}>
+                Inactive
+              </Typography>
+            </React.Fragment>
+          ),
+        },
+      }}
+      sx={{
+        '--Switch-thumbWidth': '50px',
+        '--Switch-thumbSize': '30px',
+        '--Switch-trackWidth': '100px',
+        '--Switch-trackHeight': '31px',
+        "& .MuiSwitch-track": {
+          backgroundColor: "#02704a !important"
+        }
+      }}
+    />
+
+        
    
-        <label className="toggle-text">
+        {/* <label className="toggle-text">
           <Toggle
             checked={isWorking}
             onChange={() => setActive(active => !active)}
@@ -272,7 +315,7 @@ export default function ProvidersPage(props) {
             icons={false}
           />
           {active ? 'Active' : 'In-Active'}
-        </label>
+        </label> */}
 
         {/* <div className="toggle-container">
           <input
@@ -606,11 +649,28 @@ export default function ProvidersPage(props) {
                           alt="logo"
                           onClick={() => handleShowLabel(idx)}
                         />
+
+                        
                         {showLabel[idx] && (
-                          <label style={{ position: "absolute" }}>
-                            <div onClick={() => setProvider(item)}>Edit</div>
+                          <label style={{ position: "absolute", top: "10px" }}>
+                            {/* <div onClick={() => setProvider(item)}>Edit</div> */}
+                            {item.active===false && (
+                              <div>
+                                 <div onClick={() => setProvider(item)}>Edit</div>
+                              </div>
+                            )}
+                          </label>
+                        )}
+
+
+                        {showLabel[idx] && (
+                          <label style={{ position: "absolute"}}>
+                            {/* <div onClick={() => setProvider(item)}>Edit</div> */}
                             {item.active && (
+                              <div>
+                                 <div onClick={() => setProvider(item)}>Edit</div>
                               <div onClick={() => removeProvider(item)}>Delete</div>
+                              </div>
                             )}
                           </label>
                         )}
