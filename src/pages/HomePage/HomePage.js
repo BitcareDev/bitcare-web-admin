@@ -136,6 +136,7 @@ export default function Home(props) {
     setDay(yesterday)
               setSearch('');
               setActive(true);
+              setShow(false);
               var isCF=consentForms.find(elm=>elm===item)
               console.log("iscf",isCF);
               if(isCF)
@@ -561,7 +562,7 @@ export default function Home(props) {
         className="menu-col"
         style={{ padding: '15px 10px' }}>
         <img src="../assets/logo.png" className="navbar-logo" alt="logo" />
-        <div style={{ marginTop: '10px' }}>
+        <div style={{ marginTop: '10px', height: '85%', overflowY: 'auto' }}>
         {selectedItem==='chat' && <Sidebar/>}
           {!adminLocation && <>
             <div className="menu-item">Locations</div>

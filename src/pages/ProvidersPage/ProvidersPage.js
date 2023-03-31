@@ -1,5 +1,6 @@
 import "./ProvidersPage.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState }  from "react";
+import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
@@ -8,6 +9,8 @@ import Select from "react-select";
 import Modal from "react-bootstrap/Modal";
 import Toggle from 'react-toggle'
 import "react-toggle/style.css" ;
+import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 
 export default function ProvidersPage(props) {
   const {search,setActive,setFilter,filter}=props;
@@ -18,6 +21,8 @@ export default function ProvidersPage(props) {
   const [filteredProviders, setFilteredProviders] = useState([]);
   const [isNew, setIsNew] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingProvider, setIsEditingProvider] = useState(false);
   const [offDays, setOffDays] = useState([
     {
       day: "Sun",
@@ -53,6 +58,7 @@ export default function ProvidersPage(props) {
   // const [field, state, { setValue, setTouched }] = useField('services');
   const [selectedOption, setSelectedOption] = useState(null);
   const [showLabel, setShowLabel] = useState([]);
+  
   const {
     name,
     email,
@@ -148,11 +154,17 @@ export default function ProvidersPage(props) {
     setShowLabel(labels);
   };
 
+  // const handleCheckbox = (index) => {
+  //   const days = offDays.map((day, idx) => {
+  //     if (idx === index) day.off = !day.off;
+  //     return day;
+  //   });
+  //   setOffDays(days);
+  // };
+
   const handleCheckbox = (index) => {
-    const days = offDays.map((day, idx) => {
-      if (idx === index) day.off = !day.off;
-      return day;
-    });
+    const days = [...offDays];
+    days[index].off = !days[index].off;
     setOffDays(days);
   };
 
@@ -179,6 +191,19 @@ export default function ProvidersPage(props) {
   //     setProvider(item);
 
   // }
+
+  // const handleEditProvider = (idx) => {
+  //   isEditing(true);
+  //   handleShowLabel(idx);
+  // };
+
+  const handleEditProvider = (idx) => {
+    isEditingProvider(true);
+    handleShowLabel(idx);
+  };
+  
+
+  
 
   useEffect(() => {
     console.log("Provider: ", provider);
@@ -209,12 +234,13 @@ export default function ProvidersPage(props) {
     }
   }, [provider]);
 
-  const addProvider = () => {
-    setProvider(null);
-    // console.log("provider: ",provider);
-    setIsNew(true);
-    setIsEdit(false);
-  };
+  // const addProvider = () => {
+  //   setProvider(null);
+  //   // console.log("provider: ",provider);
+  //   setIsNew(true);
+  //   setIsEdit(false);
+  // };
+
   // useEffect(()=>{
   //   console.log('days updated',offDays);
   // },[offDays])
@@ -223,27 +249,119 @@ export default function ProvidersPage(props) {
   //   setValue(value);
   // };
 
+  const addProvider = () => {
+    setProvider(null);
+    setIsNew(true);
+    setIsEdit(false);
+    setShowLabel(providers.map(() => false)); // Reset showLabel to hide all labels
+  };
+  
+  const handleCancel = () => {
+    setProvider(null);
+    setIsNew(false);
+    setIsEdit(false);
+    setShowLabel(providers.map(() => false)); // Reset showLabel to hide all labels
+  };
+  
+
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h4>Providers</h4>
-        {filter && <Toggle
-        name={'Active'}
-        value={'Active'}
+        {/* <label className="toggle-text">
+  <Toggle
     checked={isWorking}
-    onChange={()=>setActive(act=>!act)} 
+    onChange={() => setActive(active => !active)}
     className='custom-toggle'
-    icons={false}/>}
-        <button
-          className="add-provider-btn"
-          onClick={() => {
-            setFilter(false);
-            return !isEdit ? setIsNew(true) : setProvider(null)
-          }}
-        >
-          Add provider
-        </button>
+    checkedLabel={'Active'}
+    uncheckedLabel={'In-Active'}
+  />
+</label> */}
+
+
+<Switch
+      checked={isWorking}
+      onClick={() => setActive(active => !active)}
+      slotProps={{
+        track: {
+          children: (
+            <React.Fragment>
+              <Typography component="span" level="inherit" sx={{ ml: '10px', fontSize: "12px", fontWeight: "bold" }}>
+                Active
+              </Typography>
+              <Typography component="span" level="inherit" sx={{ ml: "5px", mr: "3px", fontSize: "12px", fontWeight: "bold" }}>
+                Inactive
+              </Typography>
+            </React.Fragment>
+          ),
+        },
+      }}
+      sx={{
+        '--Switch-thumbWidth': '50px',
+        '--Switch-thumbSize': '30px',
+        '--Switch-trackWidth': '100px',
+        '--Switch-trackHeight': '31px',
+        "& .MuiSwitch-track": {
+          backgroundColor: "#02704a !important"
+        }
+      }}
+    />
+
+        
+   
+        {/* <label className="toggle-text">
+          <Toggle
+            checked={isWorking}
+            onChange={() => setActive(active => !active)}
+            className='custom-toggle'
+            placeholder={active ? 'Active' : 'In-Active'}
+            icons={false}
+          />
+          {active ? 'Active' : 'In-Active'}
+        </label> */}
+
+        {/* <div className="toggle-container">
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={() => setActive(active => !active)}
+            className="toggle"
+            id="toggle"
+          />
+          <label htmlFor="toggle" className="toggle-label">
+            {active ? "Active" : "Inactive"}
+          </label>
+        </div> */}
+
       </div>
+      {/* <button
+        className="add-provider-btn"
+        onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
+        disabled={isEditing}
+      >
+        Add provider
+      </button> */}
+
+{/* {!isEdit && (
+  <button
+    className="add-provider-btn"
+    onClick={() => setIsNew(true)}
+    disabled={isEditing}
+  >
+    Add provider
+  </button>
+)} */}
+
+<button
+  className={`add-provider-btn ${isNew || isEdit ? 'disabled' : ''}`}
+  onClick={() => (!isEdit ? setIsNew(true) : setProvider(null))}
+  disabled={isNew || isEdit}
+>
+  Add provider
+</button>
+
+
+
       {isNew ? (
         <Formik
           enableReinitialize={true}
@@ -358,7 +476,7 @@ export default function ProvidersPage(props) {
                     <ErrorMessage name="phone" component="div" />
                   </div>
                   <div class="col-md-6 col-sm-6 item">
-                    <Field type="text" name="location" placeholder="Location" />
+                    <Field type="text" name="Location" placeholder="Location" />
                     <ErrorMessage name="location" component="div" />
                   </div>
                   <div class="col-md-6 col-sm-6 item">
@@ -386,7 +504,7 @@ export default function ProvidersPage(props) {
                     {
                       services && services.length > 0 && (
                         <Field
-                          className="custom-select"
+                          // className="custom-select"
                           name="services"
                           options={services}
                           component={CustomSelect}
@@ -394,10 +512,53 @@ export default function ProvidersPage(props) {
                           isMulti={true}
                         />
                       )
+
+                      
+                      // <Select
+                      //   className='service-checkbox'
+                      //   isObject={false}
+                      //   name="services"
+                      //   defaultValue={selectedOption}
+                      //   // value={getValue()}
+                      //   onChange={setSelectedOption}
+                      //   // placeholder={placeholder}
+                      //   options={services}
+                      //   isMulti={true}
+
+                      // />
+
+                      // <Field  name="services"
+                      // component={()=>
+                      // <Multiselect
+                      //   name="services"
+                      //   // displayValue="key"
+                      //   isObject={false}
+                      //   hideSelectedList
+                      //   onKeyPressFn={function noRefCheck(){}}
+                      //   onRemove={function noRefCheck(){}}
+                      //   onSearch={function noRefCheck(){}}
+                      //   onSelect={function noRefCheck(){}}
+                      //   options={services}
+                      //   showCheckbox={true}
+                      // />
+                      // }></Field>
                     }
                   </div>
+
+                  <div class="col-md-6 col-sm-6 item">
+                  <label>
+                    <Field
+                      type="checkbox"
+                      name="active"
+                      className="day-checkbox"
+                      // value={!isActive}
+                    />
+                    Active
+                  </label>
+                </div>
+                
                   <div class="col-md-8 col-sm-8 item">
-                    <div role="group" aria-labelledby="checkbox-group">
+                    {/* <div role="group" aria-labelledby="checkbox-group">
                       <label>Off Days:</label>
                       {offDays &&
                         offDays.map((day) => (
@@ -411,13 +572,15 @@ export default function ProvidersPage(props) {
                             {day.day}
                           </label>
                         ))}
+                    </div> */}
+
+                      
+                    <div id="checkboxes">
+                      <label>Off days</label>
+                      <ul style={{paddingLeft:'0'}}>
+                        {offDays.map((day,idx)=> <li className="day"><input type="checkbox" name="offDays" className="day-checkbox" onChange={()=>handleCheckbox(idx)}/>{day.day}</li>)}
+                      </ul>
                     </div>
-                    {/* <div id="checkboxes">
-  <label>Off days</label>
-  <ul style={{paddingLeft:'0'}}>
-    {offDays.map((day,idx)=> <li className="day"><input type="checkbox" name="offDays" className="day-checkbox" onChange={()=>handleCheckbox(idx)}/>{day.day}</li>)}
-  </ul>
-</div> */}
                   </div>
                   <div
                     class="col-md-2 col-sm-2 item"
@@ -429,6 +592,8 @@ export default function ProvidersPage(props) {
                         background: "#02704A",
                         color: "white",
                         border: "0",
+                        paddingLeft: "15px",
+                        paddingRight: "15px"
                       }}
                       disabled={isSubmitting}
                     >
@@ -438,11 +603,13 @@ export default function ProvidersPage(props) {
                   <div class="col-md-1 col-sm-1 item">
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsNew(false);
-                        setFilter(true);
-                      }}
-                      style={{ border: "0" }}
+                      onClick={handleCancel}
+                      style={{
+                         border: "0",
+                         paddingLeft: "15px",
+                         paddingRight: "15px"
+                         
+                        }}
                     >
                       Cancel
                     </button>
@@ -487,16 +654,33 @@ export default function ProvidersPage(props) {
                           alt="logo"
                           onClick={() => handleShowLabel(idx)}
                         />
+
+                        
                         {showLabel[idx] && (
-                          <label style={{ position: "absolute" }}>
-                            <div onClick={() => {
-                              setProvider(item);
-                              setFilter(false)}}>Edit</div>
-                            <div onClick={() => removeProvider(item)}>
-                              Delete
-                            </div>
+                          <label style={{ position: "absolute", top: "10px" }}>
+                            {/* <div onClick={() => setProvider(item)}>Edit</div> */}
+                            {item.active===false && (
+                              <div>
+                                 <div onClick={() => setProvider(item)}>Edit</div>
+                              </div>
+                            )}
                           </label>
                         )}
+
+
+                        {showLabel[idx] && (
+                          <label style={{ position: "absolute"}}>
+                            {/* <div onClick={() => setProvider(item)}>Edit</div> */}
+                            {item.active && (
+                              <div>
+                                 <div onClick={() => setProvider(item)}>Edit</div>
+                              <div onClick={() => removeProvider(item)}>Delete</div>
+                              </div>
+                            )}
+                          </label>
+                        )}
+
+
                       </div>
                     </div>
                     <div>
@@ -533,6 +717,7 @@ export default function ProvidersPage(props) {
                               style={{ display: "inline-flex" }}
                             >
                               <img
+                              
                                 src="../assets/icons8-location-50.png"
                                 className="doctor-icon"
                                 alt="logo"
@@ -547,15 +732,13 @@ export default function ProvidersPage(props) {
                           />
                           <p className="item-value">{item.providerName}</p> */}
                         </div>
-                        <div
-                          class="col-md-4"
-                          style={{ display: "inline-flex" }}
-                        >
+                        <div class="col-md-4" style={{ display: "inline-flex" }}>
                           <img
                             style={{ height: "100px", width: "100px" }}
-                            src={item.image}
+                            src={item.image ? item.image : "../assets/default-image.jpg"}
                           />
                         </div>
+
                       </div>
                     </div>
                   </div>

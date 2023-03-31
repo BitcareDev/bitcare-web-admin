@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import * as React from "react";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Formik, Form, Field, ErrorMessage, useField } from "formik";
@@ -6,6 +7,8 @@ import './LocationsPage.css';
 import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
 import Toggle from 'react-toggle'
 import "react-toggle/style.css" ;
+import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 
 export default function LocationsPage(props) {
   const {search,setActive}=props;
@@ -41,33 +44,98 @@ export default function LocationsPage(props) {
     };
   }, [location,isOpen]);
 
+  // useEffect(()=>{
+  //   setFilteredLocations([]);
+  //   if(search==='')
+  //   setFilteredLocations(locations)
+  //   if(search!==''){
+  //     locations.forEach((item)=>{
+  //       if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || item.address.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+  //       setFilteredLocations((arr) => [...arr, item]);
+  //     })
+  //   }
+  // },[search,filterdLocations])
+
   useEffect(()=>{
     setFilteredLocations([]);
-    if(search==='')
-    setFilteredLocations(locations)
-    if(search!==''){
-      locations.forEach((item)=>{
-        if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || item.address.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-        setFilteredLocations((arr) => [...arr, item]);
-      })
+    if(search==='') {
+        setFilteredLocations(locations);
+    } else {
+        locations.forEach((item)=>{
+            const name = item.name ? item.name.toLocaleLowerCase() : '';
+            const address = item.address ? item.address.toLocaleLowerCase() : '';
+            if(name.includes(search.toLocaleLowerCase()) || address.includes(search.toLocaleLowerCase())) {
+                setFilteredLocations((arr) => [...arr, item]);
+            }
+        });
     }
-  },[search,filterdLocations])
+},[search, locations]);
+
 
   return (<>
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <h4>Locations</h4>
-      <Toggle
-    checked={isOpen}
-    onChange={()=>setActive(act=>!act)} 
-    className='custom-toggle'
-    icons={false}/>
-      <button
+
+      <Switch 
+  checked={active}
+  onClick={() => setActive(active => !active)}
+  slotProps={{
+    track: {
+      children: (
+        <React.Fragment>
+          <Typography component="span" level="inherit" sx={{ ml: '10px', fontSize: "12px", fontWeight: "bold" }}>
+            Active
+          </Typography>
+          <Typography component="span" level="inherit" sx={{ ml: "5px", mr: "3px", fontSize: "12px", fontWeight: "bold" }}>
+            Inactive
+          </Typography>
+        </React.Fragment>
+      ),
+    },
+  }}
+  sx={{
+    '--Switch-thumbWidth': '50px',
+    '--Switch-thumbSize': '30px',
+    '--Switch-trackWidth': '100px',
+    '--Switch-trackHeight': '31px',
+    "& .MuiSwitch-track": {
+      backgroundColor: "#02704a !important"
+    }
+  }}
+/>
+
+
+      {/* <label className="toggle-text">
+          <Toggle
+            checked={active}
+            onChange={() => setActive(active => !active)}
+            className='custom-toggle'
+            placeholder={active ? 'Active' : 'In-Active'}
+            icons={false}
+          />
+          {active ? 'Active' : 'In-Active'}
+        </label> */}
+
+
+      {/* <div className="toggle-container">
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={() => setActive(active => !active)}
+            className="toggle"
+            id="toggle"
+          />
+          <label htmlFor="toggle" className="toggle-label">
+            {active ? "Active" : "Inactive"}
+          </label>
+      </div> */}
+    </div>
+    <button
         className="add-provider-btn"
         onClick={() => setIsNew(true)}
       >
         Add location
-      </button>
-    </div>
+    </button>
     {isNew ? <div>
       <Formik
         enableReinitialize={true}
